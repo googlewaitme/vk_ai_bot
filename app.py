@@ -9,7 +9,9 @@ df = DialogFlow()
 
 @bot.message_handler()
 def echo(event: SimpleBotEvent) -> str:
-    answer = df.get_answer(event.object.object.message.text)
+    # TODO нужно получать юзер id и передавать в get_answer
+    user_id = event.object.object.message.from_id
+    answer = df.get_answer(user_id, event.object.object.message.text)
     return answer
 
 
