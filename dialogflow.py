@@ -3,6 +3,8 @@ from google.protobuf.json_format import MessageToDict
 
 from datetime import date
 
+def get_digits_from_string(string):
+    return ''.join([n for n in string if n.isdigit()])
 
 class DialogFlow:
     def __init__(self):
@@ -32,31 +34,22 @@ class DialogFlow:
 
     def make_url(self, params):
         base = 'https://my.incognitocr.ru/#/loan-vk?'
-
-        # phone-number
-        number = ''.join(
-            [n for n in str(params['phone-number']) if n.isdigit()])
+        number = get_digits_from_string(str(params['phone-number']))
 
         url = base + "phone=" + number + "&"
 
-        # dates given like 2022-04-05T00:00:00+05:00
-        delta_dates = MessageToDict(params['date-period'])
-        start_date = self._get_date(delta_dates['startDate'])
-        end_date = self._get_date(delta_dates['endDate'])
-        delta = end_date - start_date
-        count_days = str(delta.days)
+        count_days = get_digits_from_string(
+            params['count_of_days'].string_value)
         url += f"days={count_days}&"
 
         # birthday
-        # TODO truble with birtday(почему-то год записан)
         birthday_string = MessageToDict(params['birthday'])
         birthday_date = self._get_date(birthday_string)
         birthday = birthday_date.strftime("%d.%m.%Y")
         url += f"birth_date={birthday}&"
 
         # sum
-        data = MessageToDict(params['unit-currency'])
-        amount = data['amount']
+        amount = get_digits_from_string(params['SumForLoan'].string_value)
         url += f"sum={amount}"
         return url
 
